@@ -8,16 +8,19 @@ jobs:
   test:
     runs-on: ubuntu-24.04
     env:
-      RCLONE_VERSION: v1.76.0
+      # Not RCLONE_*: rclone reads every such variable as one of its options.
+      RELEASE: v1.76.0
     steps:
       - uses: actions/checkout@v7.0.1
       # uv runs the cross-check with the rclone-crypt Python package.
       - uses: astral-sh/setup-uv@v10.3.3
+        with:
+          enable-cache: false
       - name: Install rclone
         run: |
-          curl -fsSLO "https://downloads.rclone.org/$RCLONE_VERSION/rclone-$RCLONE_VERSION-linux-amd64.zip"
-          unzip -q "rclone-$RCLONE_VERSION-linux-amd64.zip"
-          sudo install -m 755 "rclone-$RCLONE_VERSION-linux-amd64/rclone" /usr/local/bin/rclone
+          curl -fsSLO "https://downloads.rclone.org/$RELEASE/rclone-$RELEASE-linux-amd64.zip"
+          unzip -q "rclone-$RELEASE-linux-amd64.zip"
+          sudo install -m 755 "rclone-$RELEASE-linux-amd64/rclone" /usr/local/bin/rclone
           rclone version
       - name: Build, warnings as errors
         run: cc -std=c99 -Wall -Wextra -pedantic -Werror -O2 -o rclone-decrypt rclone-decrypt.c
